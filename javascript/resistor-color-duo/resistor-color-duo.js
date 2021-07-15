@@ -21,24 +21,10 @@ function getColorIndex(color) {
 }
 
 /**
- * In postional numeral systems you take it's position and use that as the exponentation of 10
- * So in the case of 68 = 6 x 10^1 + 8 x 10^0 = 60 + 8 = 68!
- * @param {*} integerValues 
- * @returns 
- */
-function convertToInteger(integerValues) {
-  let accumulator = 0;
-  integerValues.forEach((integer, index) => accumulator += integer * Math.pow(10, (integerValues.length - 1) - index));
-  return accumulator;
-}
-
-/**
  * Function to decode colors to a single integer
  * @param {array} colors 
  * @returns {int} 
  */
 export const decodedValue = (colors) => {
-  let integerValues = [];
-  colors.splice(0, 2).forEach( color => integerValues.push(getColorIndex(color)));
-  return convertToInteger(integerValues);
+  return getColorIndex(colors[0]) * 10 + getColorIndex(colors[1]);
 };
