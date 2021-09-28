@@ -1,4 +1,5 @@
 const SHIFT_DAYS = {
+  "teenth": 0,
   "first": 0,
   "second": 7,
   "third": 14,
@@ -12,23 +13,27 @@ Date.prototype.getWeekDay = function() {
   return weekday[this.getDay()];
 }
 
-const daysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
-
-export const meetup = (year, month, descriptor, day) => {
-  const first_day_of_month = (descriptor == "teenth") ? 13 : 1;
-  const last_day_of_month = (descriptor == "teenth") ? 20 : daysInMonth(year, month);
-  
-  // If we're looking for the last day in the month, need to push the month on so we can go back 7 days
-  month = (descriptor == "last") ? month : month - 1;
-  
-  for (let i=first_day_of_month; i<last_day_of_month; i++) {
+const getDate = (firstDayOfMonth, lastDayOfMonth, year, month, day, descriptor) => {
+  month = (descriptor === "last") ? month : month - 1;
+  for (let i=firstDayOfMonth; i<lastDayOfMonth; i++) {
     let date = new Date(year, month, i);
-    if (date.getWeekDay() == day) {
-      if (descriptor != 'teenth') {
-        // second monday, third monday, fourth monday are 1, 2, 3 weeks or 7, 14, 21 days from first monday 
-        date.setDate(date.getDate() + SHIFT_DAYS[descriptor]);
-      }
+    if (date.getWeekDay() === day) {
+      date.setDate(date.getDate() + SHIFT_DAYS[descriptor]);
     return date;  
     }
   }
+}
+
+const numberOfDaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
+
+const getFirstDayOfMonth = (descriptor) => (descriptor === "teenth") ? 13 : 1;
+
+const getLastDayOfMonth = (descriptor, year, month) => {
+  return (descriptor === "teenth") ? 20 : numberOfDaysInMonth(year, month);
+}
+
+export const meetup = (year, month, descriptor, day) => {
+  const firstDayOfMonth = getFirstDayOfMonth(descriptor);
+  const lastDayOfMonth = getLastDayOfMonth(descriptor, year, month);
+  return getDate(firstDayOfMonth, lastDayOfMonth, year, month, day, descriptor);
 };
