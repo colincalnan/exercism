@@ -1,39 +1,47 @@
-const SHIFT_DAYS = {
-  "teenth": 0,
-  "first": 0,
-  "second": 7,
-  "third": 14,
-  "fourth": 21,
-  "last": -7
-}
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-// New date prototype for getting weekday
-Date.prototype.getWeekDay = function() {
-  var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  return weekday[this.getDay()];
-}
-
-const getDate = (firstDayOfMonth, lastDayOfMonth, year, month, day, descriptor) => {
-  month = (descriptor === "last") ? month : month - 1;
-  for (let i=firstDayOfMonth; i<lastDayOfMonth; i++) {
-    let date = new Date(year, month, i);
-    if (date.getWeekDay() === day) {
-      date.setDate(date.getDate() + SHIFT_DAYS[descriptor]);
-    return date;  
+const getMatchingDaysInMonth = (year, month, day_of_week) => {
+  let date = new Date(year, month-1, 1);
+  let matchingDays = [];
+  while (date.getMonth() === month-1) {
+    if(WEEKDAYS[date.getDay()] === day_of_week) {
+      matchingDays.push(new Date(date));
     }
+    date.setDate(date.getDate() + 1)
+  }
+  return matchingDays;
+}
+
+const nthLookup = (descriptor, list) => {
+  switch(descriptor) {
+    case "first":
+      return list[0];
+ 
+    case "second": 
+      return list[1];
+
+    case "third": 
+      return list[2];
+    
+    case "fourth": 
+      return list[3];
   }
 }
 
-const numberOfDaysInMonth = (year, month) => new Date(year, month+1, 0).getDate();
-
-const getFirstDayOfMonth = (descriptor) => (descriptor === "teenth") ? 13 : 1;
-
-const getLastDayOfMonth = (descriptor, year, month) => {
-  return (descriptor === "teenth") ? 20 : numberOfDaysInMonth(year, month);
+const filterDatesByDescriptor = (descriptor, list) => {
+  switch(descriptor) {
+    case "teenth":
+      return list.filter(date => date.getDate()>12 && date.getDate() < 20).pop();
+    
+    case "last":
+      return list.pop();
+ 
+    default:
+      return nthLookup(descriptor, list);
+  }
 }
 
-export const meetup = (year, month, descriptor, day) => {
-  const firstDayOfMonth = getFirstDayOfMonth(descriptor);
-  const lastDayOfMonth = getLastDayOfMonth(descriptor, year, month);
-  return getDate(firstDayOfMonth, lastDayOfMonth, year, month, day, descriptor);
-};
+export const meetup = (year, month, descriptor, day_of_week) => {
+  let matchingDaysInMonth = getMatchingDaysInMonth(year, month, day_of_week);
+  return filterDatesByDescriptor(descriptor, matchingDaysInMonth);
+}
