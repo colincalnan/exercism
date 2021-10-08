@@ -8,8 +8,11 @@ export class NucleotideCounts {
     }
     
     for (const nucleotide of strand ) {
-      if(typeof nucleotides[nucleotide] === 'undefined') throw new Error('Invalid nucleotide in strand');
-      nucleotides[nucleotide] += 1;
+      if(nucleotide in nucleotides) {
+        nucleotides[nucleotide] += 1;
+      } else {
+        throw new Error('Invalid nucleotide in strand');
+      } 
     }
 
     return Object.values(nucleotides).join(' ');
