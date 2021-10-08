@@ -12,36 +12,16 @@ const getMatchingDaysInMonth = (year, month, day_of_week) => {
   return matchingDays;
 }
 
-const nthLookup = (descriptor, list) => {
-  switch(descriptor) {
-    case "first":
-      return list[0];
- 
-    case "second": 
-      return list[1];
-
-    case "third": 
-      return list[2];
-    
-    case "fourth": 
-      return list[3];
-  }
-}
-
-const filterDatesByDescriptor = (descriptor, list) => {
-  switch(descriptor) {
-    case "teenth":
-      return list.filter(date => date.getDate()>12 && date.getDate() < 20).pop();
-    
-    case "last":
-      return list.pop();
- 
-    default:
-      return nthLookup(descriptor, list);
-  }
+const filters = {
+  "teenth": (list) => list.filter(date => date.getDate()>12 && date.getDate() < 20).pop(),
+  "first": (list) => list[0],
+  "second": (list) => list[1],
+  "third": (list) => list[2],
+  "fourth": (list) => list[3],
+  "last": (list) => list.pop()
 }
 
 export const meetup = (year, month, descriptor, day_of_week) => {
   let matchingDaysInMonth = getMatchingDaysInMonth(year, month, day_of_week);
-  return filterDatesByDescriptor(descriptor, matchingDaysInMonth);
+  return filters[descriptor](matchingDaysInMonth);
 }
